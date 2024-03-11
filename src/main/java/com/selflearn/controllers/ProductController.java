@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.selflearn.model.Product;
+import com.selflearn.model.ProductDto;
 import com.selflearn.services.ProductsRepository;
 
 @Controller
@@ -25,5 +26,11 @@ public class ProductController {
 		List<Product> products = repo.findAll(Sort.by(Sort.Direction.DESC, "id"));
 		model.addAttribute("products", products);
 		return "products/index";
+	}
+	
+	public String showCreatePage(Model model) {
+		ProductDto productDto = new ProductDto();
+		model.addAttribute("productDto", productDto);
+		return "products/CreateProduct";
 	}
 }
