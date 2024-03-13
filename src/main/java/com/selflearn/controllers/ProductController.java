@@ -1,5 +1,8 @@
 package com.selflearn.controllers;
 
+import java.io.InputStream;
+import java.nio.file.*;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +15,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.selflearn.model.Product;
 import com.selflearn.model.ProductDto;
 import com.selflearn.services.ProductsRepository;
 
+import jakarta.validation.Path;
 import jakarta.validation.Valid;
 
 @Controller
@@ -50,6 +55,39 @@ public class ProductController {
 		if (productDto.getImageFile().isEmpty()) {
 			result.addError(new FieldError("productDto", "imageFile", "The image File is required"));
 		}
+		
+		if (result.hasErrors()) {
+			return "products/CreateProduct";
+		}
+		
+		
+		//saving image file
+		MultipartFile image = productDto.getImageFile();
+		Date createdAt = new Date();
+		String storageFileName = createdAt.getTime() + "_" + image.getOriginalFilename();
+		try {
+			
+		String uploadDir = "public/images/";
+		java.nio.file.Path uploadPath = Paths.get(uploadDir);
+		if (!Files.exists(uploadPath)) {
+			Files.createDirectories(uploadPath);
+		}
+		try (InputStream inputStream = image.getInputStream()){
+			Files.copy(inputStream, Paths.get(uploadDir + storageFileName),
+			StandardCopyOption.REPLACE_EXISTING);
+		}
+		} catch (Exception ex) {
+		System.out.println("Exception:" + ex.getMessage());
+		}
+		
+		Product product = new Product();
+		product.setName(productDto.getName());
+		product.setBrand(productDto.getBrand());
+		product.setCategory(productDto.getCategory());
+		product.setPrice(productDto.getPrice());
+		product.setDescription(product.getDescription());
+		product.setCreatedAt(createdAt);
+		product.setImageFileName(storageFileName);
 		
 		return "redirect:/products";
 	}
