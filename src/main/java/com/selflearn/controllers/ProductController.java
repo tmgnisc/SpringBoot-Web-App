@@ -15,13 +15,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.selflearn.model.Product;
 import com.selflearn.model.ProductDto;
 import com.selflearn.services.ProductsRepository;
 
-import jakarta.validation.Path;
+
 import jakarta.validation.Valid;
 
 @Controller
@@ -89,7 +90,36 @@ public class ProductController {
 		product.setCreatedAt(createdAt);
 		product.setImageFileName(storageFileName);
 		
+		repo.save(product);
+		
+		
 		return "redirect:/products";
+	}
+	
+	
+	@GetMapping("/edit")
+	public String showEditPage(
+			Model model,
+			@RequestParam int id
+			) {
+		
+		try {
+			Product product = repo.findById(id).get();
+			model.addAttribute("product", product);
+			ProductDto productDto = new ProductDto();
+			productDto.setName(product.getName());
+			productDto.setBrand(product.getBrand());
+			productDto.setCategory(product.getCategory());
+			productDto.setPrice(product.getPrice());
+			productDto.setDescription(product.getDescription());
+			model.addAttribute("productDto", productDto);
+			
+		} catch (Exception ex) {
+			System.out.println("Exception:" +ex.getMessage());
+			return "redirect:/products";
+		}
+		
+		return  "products/EditProduct";
 	}
 	
 	
