@@ -138,6 +138,32 @@ public class ProductController {
 			if(result.hasErrors()) {
 				return "products/EditProducts";
 			}
+			if (!productDto.getImageFile().isEmpty()) {
+				//delete old image
+				String uploadDir = "public/images/";
+				Path oldImagePath = Paths.get(uploadDir + product.getImageFileName());
+				try {
+					Files.delete(oldImagePath);
+				} catch (Exception ex) {
+					System.out.println("exception:" +ex.getMessage());
+				}
+				
+				//save new image file
+				MultipartFile image = productDto.getImageFile();
+				Date createdAt = new Date();
+				String storageFileName = createdAt.getTime() + "___" + image.getOriginalFilename();
+				try(InputStream inputStream = image.getInputStream()){
+					Files.copy(inputStream, Paths.get(uploadDir + storageFileName),
+					StandardCopyOption.REPLACE_EXISTING);
+				}
+				product.setImageFileName(storageFileName);
+			}
+			
+			product.setName(productDto.getName());
+			product.setBrand(productDto.getBrand());
+			product.setCategory(productDto.getCategory());
+			product.setPrice(productDto.getPrice());
+			product.setDescription(product.getDescription());
 			
 		} catch (Exception ex) {
 			System.out.println("exception:" +ex.getMessage());
