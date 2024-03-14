@@ -107,6 +107,7 @@ public class ProductController {
 			Product product = repo.findById(id).get();
 			model.addAttribute("product", product);
 			ProductDto productDto = new ProductDto();
+			
 			productDto.setName(product.getName());
 			productDto.setBrand(product.getBrand());
 			productDto.setCategory(product.getCategory());
@@ -123,6 +124,7 @@ public class ProductController {
 	}
 	
 	
+	@PostMapping("/edit")
 	public String updateProduct(
 			Model model,
 			@RequestParam int id,
@@ -136,7 +138,7 @@ public class ProductController {
 			model.addAttribute("product", product);
 			
 			if(result.hasErrors()) {
-				return "products/EditProducts";
+				return "products/EditProduct";
 			}
 			if (!productDto.getImageFile().isEmpty()) {
 				//delete old image
@@ -163,7 +165,7 @@ public class ProductController {
 			product.setBrand(productDto.getBrand());
 			product.setCategory(productDto.getCategory());
 			product.setPrice(productDto.getPrice());
-			product.setDescription(product.getDescription());
+			product.setDescription(productDto.getDescription());
 			
 			repo.save(product);
 		} catch (Exception ex) {
