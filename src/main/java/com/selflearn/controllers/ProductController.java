@@ -123,4 +123,28 @@ public class ProductController {
 	}
 	
 	
+	public String updateProduct(
+			Model model,
+			@RequestParam int id,
+			@Valid @ModelAttribute ProductDto productDto,
+			BindingResult result
+			) {
+		
+		
+		try {
+			Product product = repo.findById(id).get();
+			model.addAttribute("product", product);
+			
+			if(result.hasErrors()) {
+				return "products/EditProducts";
+			}
+			
+		} catch (Exception ex) {
+			System.out.println("exception:" +ex.getMessage());
+		}
+		return "redirect:/products";
+	}
+	
+	
+	
 }
